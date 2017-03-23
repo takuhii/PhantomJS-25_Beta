@@ -1,1 +1,1 @@
-phantom.exit(123)
+phantom.exit(123);

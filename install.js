@@ -1,4 +1,4 @@
-// Copyright 2012 The Obvious Corporation.
+// Copyright 2017 Darren Mackintosh.
 
 /*
  * This simply fetches the right version of phantom for the current platform.
@@ -8,22 +8,27 @@
 
 var requestProgress = require('request-progress')
 var progress = require('progress')
-var AdmZip = require('adm-zip')
+var extractZip = require('extract-zip')
 var cp = require('child_process')
 var fs = require('fs-extra')
-var glob = require('glob')
 var helper = require('./lib/phantomjs')
 var kew = require('kew')
-var mkdirp = require('mkdirp')
-var npmconf = require('npmconf')
 var path = require('path')
 var request = require('request')
-var os = require('os')
 var url = require('url')
+var util = require('./lib/util')
 var which = require('which')
-
+var os = require('os')
 
 var originalPath = process.env.PATH
+
+var checkPhantomjsVersion = util.checkPhantomjsVersion
+var getTargetPlatform = util.getTargetPlatform
+var getTargetArch = util.getTargetArch
+var getDownloadSpec = util.getDownloadSpec
+var findValidPhantomJsBinary = util.findValidPhantomJsBinary
+var verifyChecksum = util.verifyChecksum
+var writeLocationFile = util.writeLocationFile
 
 // If the process exits without going through exit(), then we did not complete.
 var validExit = false
@@ -41,11 +46,8 @@ process.on('exit', function () {
 process.env.PATH = helper.cleanPath(originalPath)
 
 var libPath = path.join(__dirname, 'lib')
-var pkgPath = path.join(libPath, 'phantom', 'bin')
+var pkgPath = path.join(libPath, 'phantom')
 var phantomPath = null
-var tmpPath = null
-
-var npmConfPromise = kew.nfcall(npmconf.load)
 
 // If the user manually installed PhantomJS, we want
 // to use the existing version.
@@ -59,22 +61,17 @@ var npmConfPromise = kew.nfcall(npmconf.load)
 // https://github.com/Obvious/phantomjs/issues/85
 // https://github.com/Medium/phantomjs/pull/184
 kew.resolve(true)
-  .then(function () {
-    return tryPhantomjsOnPath()
-  })
-  .then(function () {
-    return downloadPhantomjs()
-  })
-  .then(function (downloadedFile) {
-    return extractDownload(downloadedFile)
-  })
+  .then(tryPhantomjsInLib)
+  .then(tryPhantomjsOnPath)
+  .then(downloadPhantomjs)
+  .then(extractDownload)
   .then(function (extractedPath) {
     return copyIntoPlace(extractedPath, pkgPath)
   })
   .then(function () {
-    var location = process.platform === 'win32' ?
-        path.join(pkgPath, 'phantomjs.exe') :
-        path.join(pkgPath, 'phantomjs')
+    var location = getTargetPlatform() === 'win32' ?
+        path.join(pkgPath, 'bin', 'phantomjs.exe') :
+        path.join(pkgPath, 'bin' ,'phantomjs')
 
     try {
       // Ensure executable is executable by all users
@@ -98,16 +95,6 @@ kew.resolve(true)
     exit(1)
   })
 
-
-function writeLocationFile(location) {
-  console.log('Writing location.js file')
-  if (process.platform === 'win32') {
-    location = location.replace(/\\/g, '\\\\')
-  }
-  fs.writeFileSync(path.join(libPath, 'location.js'),
-      'module.exports.location = "' + location + '"')
-}
-
 function exit(code) {
   validExit = true
   process.env.PATH = originalPath
@@ -115,18 +102,20 @@ function exit(code) {
 }
 
 
-function findSuitableTempDirectory(npmConf) {
+function findSuitableTempDirectory() {
   var now = Date.now()
   var candidateTmpDirs = [
-    process.env.TEMP || process.env.TMPDIR || npmConf.get('tmp'),
-    '/tmp',
+    process.env.npm_config_tmp,
+    os.tmpdir(),
     path.join(process.cwd(), 'tmp')
   ]
 
   for (var i = 0; i < candidateTmpDirs.length; i++) {
-    var candidatePath = path.join(candidateTmpDirs[i], 'phantomjs')
+    var candidatePath = candidateTmpDirs[i]
+    if (!candidatePath) continue
 
     try {
+      candidatePath = path.join(path.resolve(candidatePath), 'phantomjs')
       fs.mkdirsSync(candidatePath, '0777')
       // Make double sure we have 0777 permissions; some operating systems
       // default umask does not allow write by default.
@@ -141,18 +130,18 @@ function findSuitableTempDirectory(npmConf) {
   }
 
   console.error('Can not find a writable tmp directory, please report issue ' +
-      'with as much information as possible.')
+      'on https://github.com/Medium/phantomjs/issues with as much ' +
+      'information as possible.')
   exit(1)
 }
 
 
-function getRequestOptions(conf) {
-  var strictSSL = conf.get('strict-ssl')
+function getRequestOptions() {
+  var strictSSL = !!process.env.npm_config_strict_ssl
   if (process.version == 'v0.10.34') {
     console.log('Node v0.10.34 detected, turning off strict ssl due to https://github.com/joyent/node/issues/8894')
     strictSSL = false
   }
-
 
   var options = {
     uri: getDownloadUrl(),
@@ -162,7 +151,9 @@ function getRequestOptions(conf) {
     strictSSL: strictSSL
   }
 
-  var proxyUrl = conf.get('https-proxy') || conf.get('http-proxy') || conf.get('proxy')
+  var proxyUrl = process.env.npm_config_https_proxy ||
+      process.env.npm_config_http_proxy ||
+      process.env.npm_config_proxy
   if (proxyUrl) {
 
     // Print using proxy
@@ -175,21 +166,56 @@ function getRequestOptions(conf) {
 
     // Enable proxy
     options.proxy = proxyUrl
-
-    // If going through proxy, use the user-agent string from the npm config
-    options.headers['User-Agent'] = conf.get('user-agent')
   }
 
+  // Use the user-agent string from the npm config
+  options.headers['User-Agent'] = process.env.npm_config_user_agent
+
   // Use certificate authority settings from npm
-  var ca = conf.get('ca')
+  var ca = process.env.npm_config_ca
+  if (!ca && process.env.npm_config_cafile) {
+    try {
+      ca = fs.readFileSync(process.env.npm_config_cafile, {encoding: 'utf8'})
+        .split(/\n(?=-----BEGIN CERTIFICATE-----)/g)
+
+      // Comments at the beginning of the file result in the first
+      // item not containing a certificate - in this case the
+      // download will fail
+      if (ca.length > 0 && !/-----BEGIN CERTIFICATE-----/.test(ca[0])) {
+        ca.shift()
+      }
+
+    } catch (e) {
+      console.error('Could not read cafile', process.env.npm_config_cafile, e)
+    }
+  }
+
   if (ca) {
     console.log('Using npmconf ca')
+    options.agentOptions = {
+      ca: ca
+    }
     options.ca = ca
   }
 
   return options
 }
 
+function handleRequestError(error) {
+  if (error && error.stack && error.stack.indexOf('SELF_SIGNED_CERT_IN_CHAIN') != -1) {
+      console.error('Error making request, SELF_SIGNED_CERT_IN_CHAIN. ' +
+          'Please read https://github.com/Medium/phantomjs#i-am-behind-a-corporate-proxy-that-uses-self-signed-ssl-certificates-to-intercept-encrypted-traffic')
+      exit(1)
+  } else if (error) {
+    console.error('Error making request.\n' + error.stack + '\n\n' +
+        'Please report this full log at https://github.com/Medium/phantomjs')
+    exit(1)
+  } else {
+    console.error('Something unexpected happened, please report this full ' +
+        'log at https://github.com/Medium/phantomjs')
+    exit(1)
+  }
+}
 
 function requestBinary(requestOptions, filePath) {
   var deferred = kew.defer()
@@ -215,25 +241,21 @@ function requestBinary(requestOptions, filePath) {
           'If you continue to have issues, please report this full log at ' +
           'https://github.com/Medium/phantomjs')
       exit(1)
-    } else if (error && error.stack && error.stack.indexOf('SELF_SIGNED_CERT_IN_CHAIN') != -1) {
-      console.error('Error making request, SELF_SIGNED_CERT_IN_CHAIN. Please read https://github.com/Medium/phantomjs#i-am-behind-a-corporate-proxy-that-uses-self-signed-ssl-certificates-to-intercept-encrypted-traffic')
-      exit(1)
-    } else if (error) {
-      console.error('Error making request.\n' + error.stack + '\n\n' +
-          'Please report this full log at https://github.com/Medium/phantomjs')
-      exit(1)
     } else {
-      console.error('Something unexpected happened, please report this full ' +
-          'log at https://github.com/Medium/phantomjs')
-      exit(1)
+      handleRequestError(error)
     }
   })).on('progress', function (state) {
-    if (!bar) {
-      bar = new progress('  [:bar] :percent :etas', {total: state.total, width: 40})
+    try {
+      if (!bar) {
+        bar = new progress('  [:bar] :percent', {total: state.size.total, width: 40})
+      }
+      bar.curr = state.size.transferred
+      bar.tick()
+    } catch (e) {
+      // It doesn't really matter if the progress bar doesn't update.
     }
-    bar.curr = state.received
-    bar.tick(0)
   })
+  .on('error', handleRequestError)
 
   return deferred.promise
 }
@@ -253,19 +275,18 @@ function extractDownload(filePath) {
 
   if (filePath.substr(-4) === '.zip') {
     console.log('Extracting zip contents')
-
-    try {
-      var zip = new AdmZip(filePath)
-      zip.extractAllTo(extractedPath, true)
-      deferred.resolve(extractedPath)
-    } catch (err) {
-      console.error('Error extracting zip')
-      deferred.reject(err)
-    }
+    extractZip(path.resolve(filePath), {dir: extractedPath}, function(err) {
+      if (err) {
+        console.error('Error extracting zip')
+        deferred.reject(err)
+      } else {
+        deferred.resolve(extractedPath)
+      }
+    })
 
   } else {
     console.log('Extracting tar contents (via spawned process)')
-    cp.execFile('tar', ['jxf', filePath], options, function (err) {
+    cp.execFile('tar', ['jxf', path.resolve(filePath)], options, function (err) {
       if (err) {
         console.error('Error extracting archive')
         deferred.reject(err)
@@ -277,55 +298,83 @@ function extractDownload(filePath) {
   return deferred.promise
 }
 
+
 function copyIntoPlace(extractedPath, targetPath) {
-  mkdirp.sync(targetPath)
-
-  var files = glob.sync(path.join(extractedPath, '**', 'phantomjs?(.exe)'))
-  console.log(files)
-
-  if (!files.length) {
-    console.log('Could not find extracted file, or too many matches!', files)
-    throw new Error('Could not find extracted file, or too many matches!')
-  }
-
-  for (var i = 0; i < files.length; i++) {
-    var file = files[i]
-
-    if (fs.statSync(file).isFile()) {
-      console.log('Copying extracted folder', file, '->', targetPath)
-      var dest = path.join(targetPath, path.basename(file))
-      if (fs.existsSync(dest))
-        fs.removeSync(dest)
-
-      return kew.nfcall(fs.move, file, dest)
+  console.log('Removing', targetPath)
+  return kew.nfcall(fs.remove, targetPath).then(function () {
+    // Look for the extracted directory, so we can rename it.
+    var files = fs.readdirSync(extractedPath)
+    for (var i = 0; i < files.length; i++) {
+      var file = path.join(extractedPath, files[i])
+      if (fs.statSync(file).isDirectory() && file.indexOf(helper.version) != -1) {
+        console.log('Copying extracted folder', file, '->', targetPath)
+        return kew.nfcall(fs.move, file, targetPath)
+      }
     }
-  }
 
+    console.log('Could not find extracted file', files)
+    throw new Error('Could not find extracted file')
+  })
+}
+
+/**
+ * Check to see if the binary in lib is OK to use. If successful, exit the process.
+ */
+function tryPhantomjsInLib() {
+  return kew.fcall(function () {
+    return findValidPhantomJsBinary(path.resolve(__dirname, './lib/location.js'))
+  }).then(function (binaryLocation) {
+    if (binaryLocation) {
+      console.log('PhantomJS is previously installed at', binaryLocation)
+      exit(0)
+    }
+  }).fail(function () {
+    // silently swallow any errors
+  })
 }
 
 /**
  * Check to see if the binary on PATH is OK to use. If successful, exit the process.
  */
 function tryPhantomjsOnPath() {
+  console.log(typeof getTargetPlatform);
+  if (getTargetPlatform() != process.platform || getTargetArch() != process.arch) {
+    console.log('Building for target platform ' + getTargetPlatform() + '/' + getTargetArch() +
+                '. Skipping PATH search')
+    return kew.resolve(false)
+  }
+
   return kew.nfcall(which, 'phantomjs')
   .then(function (result) {
     phantomPath = result
+    console.log('Considering PhantomJS found at', phantomPath)
 
     // Horrible hack to avoid problems during global install. We check to see if
     // the file `which` found is our own bin script.
     if (phantomPath.indexOf(path.join('npm', 'phantomjs')) !== -1) {
-      console.log('Looks like an `npm install -g` on windows; unable to check for already installed version.')
+      console.log('Looks like an `npm install -g` on windows; skipping installed version.')
       return
     }
 
     var contents = fs.readFileSync(phantomPath, 'utf8')
     if (/NPM_INSTALL_MARKER/.test(contents)) {
-      console.log('Looks like an `npm install -g`; unable to check for already installed version.')
+      console.log('Looks like an `npm install -g`')
+
+      var phantomLibPath = path.resolve(fs.realpathSync(phantomPath), '../../lib/location')
+      return findValidPhantomJsBinary(phantomLibPath)
+      .then(function (binaryLocation) {
+        if (binaryLocation) {
+          writeLocationFile(binaryLocation)
+          console.log('PhantomJS linked at', phantomLibPath)
+          exit(0)
+        }
+        console.log('Could not link global install, skipping...')
+      })
     } else {
       return checkPhantomjsVersion(phantomPath).then(function (matches) {
         if (matches) {
           writeLocationFile(phantomPath)
-          console.log('PhantomJS is already installed at', phantomPath + '.')
+          console.log('PhantomJS is already installed on PATH at', phantomPath)
           exit(0)
         }
       })
@@ -339,90 +388,52 @@ function tryPhantomjsOnPath() {
   })
 }
 
-
-
 /**
- * @return {?string} Get the download URL for phantomjs. May return null if no download url exists.
+ * @return {?string} Get the download URL for phantomjs.
+ *     May return null if no download url exists.
  */
 function getDownloadUrl() {
-  var downloadUrl = process.env.npm_config_phantomjs_downloadurl || process.env.PHANTOMJS_DOWNLOADURL
-  if (downloadUrl)
-    return downloadUrl
-
-  var cdnUrl = process.env.npm_config_phantomjs_cdnurl ||
-      process.env.PHANTOMJS_CDNURL ||
-      'https://bitbucket.org/ariya/phantomjs/downloads'
-
-  downloadUrl = cdnUrl + '/phantomjs-' + helper.version + '-beta-'
-
-  if (process.platform === 'linux' && process.arch === 'x64') {
-    downloadUrl += 'linux-ubuntu-xenial-x86_64.tar.gz'
-  } else if (process.platform === 'darwin' || process.platform === 'openbsd' || process.platform === 'freebsd') {
-    downloadUrl += 'macos.zip'
-
-    // workaround for os-x yosemite, where ariya's build is broken
-    // see https://github.com/ariya/phantomjs/issues/12928
-    if (parseInt(os.release()) >= 14)
-      downloadUrl = 'https://bitbucket.org/ariya/phantomjs/downloadsphantomjs-2.1.1-macosx.zip'
-
-  } else if (process.platform === 'win32') {
-    downloadUrl += 'windows.zip'
-  } else {
-    return null
-  }
-
-  return downloadUrl
+  var spec = getDownloadSpec()
+  return spec && spec.url
 }
 
 /**
  * Download phantomjs, reusing the existing copy on disk if available.
  * Exits immediately if there is no binary to download.
+ * @return {Promise.<string>} The path to the downloaded file.
  */
 function downloadPhantomjs() {
-  var downloadUrl = getDownloadUrl()
-  if (!downloadUrl) {
+  var downloadSpec = getDownloadSpec()
+  if (!downloadSpec) {
     console.error(
-        'Unexpected platform or architecture: ' + process.platform + '/' + process.arch + '\n' +
+        'Unexpected platform or architecture: ' + getTargetPlatform() + '/' + getTargetArch() + '\n' +
         'It seems there is no binary available for your platform/architecture\n' +
         'Try to install PhantomJS globally')
     exit(1)
   }
 
-  return npmConfPromise.then(function (conf) {
-    tmpPath = findSuitableTempDirectory(conf)
+  var downloadUrl = downloadSpec.url
+  var downloadedFile
 
+  return kew.fcall(function () {
     // Can't use a global version so start a download.
+    var tmpPath = findSuitableTempDirectory()
     var fileName = downloadUrl.split('/').pop()
-    var downloadedFile = path.join(tmpPath, fileName)
+    downloadedFile = path.join(tmpPath, fileName)
 
-    // Start the install.
-    if (!fs.existsSync(downloadedFile)) {
-      console.log('Downloading', downloadUrl)
-      console.log('Saving to', downloadedFile)
-      return requestBinary(getRequestOptions(conf), downloadedFile)
-    } else {
+    if (fs.existsSync(downloadedFile)) {
       console.log('Download already available at', downloadedFile)
+      return verifyChecksum(downloadedFile, downloadSpec.checksum)
+    }
+    return false
+  }).then(function (verified) {
+    if (verified) {
       return downloadedFile
     }
-  })
-}
 
-/**
- * Check to make sure a given binary is the right version.
- * @return {kew.Promise.<boolean>}
- */
-function checkPhantomjsVersion(phantomPath) {
-  console.log('Found PhantomJS at', phantomPath, '...verifying')
-  return kew.nfcall(cp.execFile, phantomPath, ['--version']).then(function (stdout) {
-    var version = stdout.trim()
-    if (helper.version == version) {
-      return true
-    } else {
-      console.log('PhantomJS detected, but wrong version', stdout.trim(), '@', phantomPath + '.')
-      return false
-    }
-  }).fail(function (err) {
-    console.error('Error verifying phantomjs, continuing', err)
-    return false
+    // Start the install.
+    console.log('Downloading', downloadUrl)
+    console.log('Saving to', downloadedFile)
+    return requestBinary(getRequestOptions(), downloadedFile)
   })
 }
