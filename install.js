@@ -130,7 +130,7 @@ function findSuitableTempDirectory() {
   }
 
   console.error('Can not find a writable tmp directory, please report issue ' +
-      'on https://github.com/Medium/phantomjs/issues with as much ' +
+      'on https://github.com/DarrenMack-OD/PhantomJS-25_Beta/issues with as much ' +
       'information as possible.')
   exit(1)
 }
@@ -208,11 +208,11 @@ function handleRequestError(error) {
       exit(1)
   } else if (error) {
     console.error('Error making request.\n' + error.stack + '\n\n' +
-        'Please report this full log at https://github.com/Medium/phantomjs')
+        'Please report this full log at https://github.com/DarrenMack-OD/PhantomJS-25_Beta')
     exit(1)
   } else {
     console.error('Something unexpected happened, please report this full ' +
-        'log at https://github.com/Medium/phantomjs')
+        'log at https://github.com/DarrenMack-OD/PhantomJS-25_Beta')
     exit(1)
   }
 }
@@ -239,7 +239,7 @@ function requestBinary(requestOptions, filePath) {
           'Response headers: ' + JSON.stringify(response.headers, null, 2) + '\n' +
           'Make sure your network and proxy settings are correct.\n\n' +
           'If you continue to have issues, please report this full log at ' +
-          'https://github.com/Medium/phantomjs')
+          'https://github.com/DarrenMack-OD/PhantomJS-25_Beta')
       exit(1)
     } else {
       handleRequestError(error)
@@ -284,7 +284,7 @@ function extractDownload(filePath) {
     })
   } else {
     console.log('Extracting tar contents (via spawned process)')
-    cp.execFile('tar', ['-xzf', path.resolve(filePath)], options, function (err) {
+    cp.execFile('tar', ['-zxvf', path.resolve(filePath)], options, function (err) {
       if (err) {
         console.error('Error extracting archive')
         deferred.reject(err)
@@ -297,16 +297,13 @@ function extractDownload(filePath) {
 }
 
 function copyIntoPlace(extractedPath, targetPath) {
-  console.log('Removing', targetPath)
-  return kew.nfcall(fs.remove, targetPath).then(function () {
-    // Look for the extracted directory, so we can rename it.
-    var files = fs.readdirSync(extractedPath)
-    for (var i = 0; i < files.length; i++) {
-      var file = path.join(extractedPath, files[i])
-      if (fs.statSync(file).isDirectory() && file.indexOf(helper.version) != -1) {
-        console.log('Copying extracted folder', file, '->', targetPath)
-        return kew.nfcall(fs.move, file, targetPath)
-      }
+  // Look for the extracted directory, so we can rename it.
+  var files = fs.readdirSync(extractedPath)
+  for (var i = 0; i < files.length; i++) {
+    var file = path.join(extractedPath, files[i])
+    if (fs.statSync(file).isDirectory() && file.indexOf(helper.version) != -1) {
+      console.log('Copying extracted folder', file, '->', targetPath)
+      return kew.nfcall(fs.move, file, targetPath)
     }
 
     console.log('Could not find extracted file', files)
