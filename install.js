@@ -260,7 +260,6 @@ function requestBinary(requestOptions, filePath) {
   return deferred.promise
 }
 
-
 function extractDownload(filePath) {
   var deferred = kew.defer()
   // extract to a unique directory in case multiple processes are
@@ -284,8 +283,8 @@ function extractDownload(filePath) {
       }
     })
   } else {
-    console.log('Extracting tar.gz contents (via spawned process)')
-    cp.execFile('tar', ['xvfz', path.resolve(filePath)], options, function (err) {
+    console.log('Extracting tar contents (via spawned process)')
+    cp.execFile('tar', ['zxf', path.resolve(filePath)], options, function (err) {
       if (err) {
         console.error('Error extracting archive')
         deferred.reject(err)
