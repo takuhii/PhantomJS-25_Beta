@@ -223,7 +223,6 @@ function requestBinary(requestOptions, filePath) {
   console.log('Receiving...')
   var bar = null
   requestProgress(request(requestOptions, function (error, response, body) {
-    console.log('')
     if (!error && response.statusCode === 200) {
       fs.writeFileSync(writePath, body)
       console.log('Received ' + Math.floor(body.length / 1024) + 'K total.')
@@ -295,6 +294,8 @@ function extractDownload(filePath) {
 }
 
 function copyIntoPlace(extractedPath, targetPath) {
+  console.log('The extracted path is: 'extractedPath);
+  console.log('The target path is: 'targetPath);
   // Look for the extracted directory, so we can rename it.
   var files = fs.readdirSync(extractedPath)
   for (var i = 0; i < files.length; i++) {
