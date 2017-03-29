@@ -5,7 +5,7 @@ An NPM wrapper for [PhantomJS](http://phantomjs.org/) *2.5 Beta* headless webkit
 
 NOTE: phantomjs v2.x is currently under heavy development. Releases should be considered unstable.
 
-[![Build Status](https://travis-ci.org/DarrenMack-OD/PhantomJS-Beta_25.svg?branch=master)](https://travis-ci.org/DarrenMack-OD/PhantomJS-Beta_25)
+[![Build Status](https://travis-ci.org/DarrenMack-OD/PhantomJS-25_Beta.svg?branch=master)](https://travis-ci.org/DarrenMack-OD/PhantomJS-25_Beta/)
 
 Building and Installing
 -----------------------
@@ -204,7 +204,7 @@ Contributing
 ------------
 
 Questions, comments, bug reports, and pull requests are all welcome.  Submit them at
-[the project on GitHub](https://github.com/DarrenMack-OD/PhantomJS-25_Beta/).
+[the project on GitHub](https://travis-ci.org/DarrenMack-OD/PhantomJS-25_Beta/).
 
 Uses [Ariya's bitbucket repo](https://bitbucket.org/ariya/phantomjs/downloads/) for downloading PhantomJS 2.5.
 
