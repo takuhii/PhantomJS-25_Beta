@@ -11,7 +11,7 @@ Building and Installing
 -----------------------
 
 ```shell
-npm install PhantomJS-Beta_25
+npm install PhantomJS25-Beta
 ```
 
 The package has been set up to fetch and run Phantom for MacOS (darwin).
