@@ -15,7 +15,7 @@ exports.testDownload = function (test) {
   test.done()
 };
 
-
+/*
 exports.testPhantomExecutesTestScript = function (test) {
   test.expect(1);
 
@@ -30,7 +30,7 @@ exports.testPhantomExecutesTestScript = function (test) {
     test.done()
   })
 }
-
+*/
 
 exports.testPhantomExitCode = function (test) {
   test.expect(1);
