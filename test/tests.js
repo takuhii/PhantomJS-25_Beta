@@ -30,7 +30,7 @@ exports.testPhantomExecutesTestScript = function (test) {
     test.done()
   })
 }
-*/
+
 
 exports.testPhantomExitCode = function (test) {
   test.expect(1);
@@ -39,7 +39,7 @@ exports.testPhantomExitCode = function (test) {
     test.done()
   })
 }
-
+*/
 exports.testCleanPath = function (test) {
   test.expect(5);
   test.equal('/Users/jeff/bin', phantomjs.cleanPath('/Users/jeff/bin:./bin'));
