@@ -38,8 +38,8 @@
     "which": "~1.2.10"
   },
   "devDependencies": {
-    "eslint": "2.7.0",
-    "nodeunit": "0.9.1",
+    "eslint": "~2.7.0",
+    "nodeunit": "~0.9.1",
     "webdriverio": "~4.2.3"
   },
   "author": "Darren Mackintosh <takuhii@gmail.com> (http://www.takuhii.tk)",
