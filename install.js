@@ -58,8 +58,6 @@ var phantomPath = null
 // Do not re-use an npm-installed PhantomJS, because
 // that can lead to weird circular dependencies between
 // local versions and global versions.
-// https://github.com/Obvious/phantomjs/issues/85
-// https://github.com/Medium/phantomjs/pull/184
 kew.resolve(true)
   .then(tryPhantomjsInLib)
   .then(tryPhantomjsOnPath)
