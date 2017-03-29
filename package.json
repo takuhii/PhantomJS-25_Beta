@@ -1,6 +1,6 @@
 {
-  "name": "phantomjs-beta_25",
-  "version": "1.0.0",
+  "name": "phantomjs25-beta",
+  "version": "1.0.2",
   "description": "Headless Webkit with JS & ES6 API",
   "main": "install.js",
   "bin": {
