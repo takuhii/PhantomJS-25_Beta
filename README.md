@@ -5,7 +5,7 @@ An NPM wrapper for [PhantomJS](http://phantomjs.org/) *2.5 Beta* headless webkit
 
 NOTE: phantomjs v2.x is currently under heavy development. Releases should be considered unstable.
 
-[![Build Status](https://travis-ci.org/DarrenMack-OD/PhantomJS-Beta_25.svg?branch=develop)](https://travis-ci.org/DarrenMack-OD/PhantomJS-Beta_25)
+[![Build Status](https://travis-ci.org/DarrenMack-OD/PhantomJS-Beta_25.svg?branch=master)](https://travis-ci.org/DarrenMack-OD/PhantomJS-Beta_25)
 
 Building and Installing
 -----------------------
@@ -14,7 +14,7 @@ Building and Installing
 npm install PhantomJS25-Beta
 ```
 
-The package has been set up to fetch and run Phantom for MacOS (darwin).
+The package has been set up to fetch and run Phantom for MacOS (darwin), Ubuntu Linux (Xenial) & Windows.
 
 Running
 -------
