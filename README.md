@@ -204,25 +204,25 @@ Contributing
 ------------
 
 Questions, comments, bug reports, and pull requests are all welcome.  Submit them at
-[the project on GitHub](https://github.com/zeevl/phantomjs2/).
+[the project on GitHub](https://github.com/DarrenMack-OD/PhantomJS-25_Beta/).
+
+Uses [Ariya's bitbucket repo](https://bitbucket.org/ariya/phantomjs/downloads/) for downloading PhantomJS 2.5.
+
+Install.js HEAVILY lifted from [Medium](https://github.com/Medium/phantomjs/)
 
 Bug reports that include steps-to-reproduce (including code) are the
 best. Even better, make them in the form of pull requests.
 
-Authors (original)
-------------------
+Author 
+------
 
-[Dan Pupius](https://github.com/dpup)
-([personal website](http://pupius.co.uk)), supported by
-[The Obvious Corporation](http://obvious.com/).
-
-Ported to phantomjs2 by [zeevl](https://github.com/zeevl)
+[Darren Mackintosh](https://github.com/DarrenMack-OD)
+([personal website](http://www.takuhii.tk)).
 
 License
 -------
 
-Copyright 2012 [The Obvious Corporation](http://obvious.com/).
+Copyright 2017 [Darren Mackintosh](http://www.takuhii.tk/).
 
-Licensed under the Apache License, Version 2.0.
-See the top-level file `LICENSE.txt` and
-(http://www.apache.org/licenses/LICENSE-2.0).
+Licensed under the MIT License.
+See the top-level file `LICENSE.txt`.
