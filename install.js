@@ -294,8 +294,8 @@ function extractDownload(filePath) {
 }
 
 function copyIntoPlace(extractedPath, targetPath) {
-  console.log('The extracted path is: 'extractedPath);
-  console.log('The target path is: 'targetPath);
+  console.log('the extracted path is', extractedPath)
+  console.log('The target path is', targetPath)
   // Look for the extracted directory, so we can rename it.
   var files = fs.readdirSync(extractedPath)
   for (var i = 0; i < files.length; i++) {
