@@ -36,7 +36,7 @@ Below is an example of using this package via node.
 ```javascript
 var path = require('path')
 var childProcess = require('child_process')
-var phantomjs = require('phantomjs2')
+var phantomjs = require('phantomjs')
 var binPath = phantomjs.path
 
 var childArgs = [
@@ -60,8 +60,7 @@ update or a patch build of the phantom binary.
 Deciding Where To Get PhantomJS
 -------------------------------
 
-By default, this package will download phantomjs from `https://bitbucket.org/ariya/phantomjs/downloads`.
-This should work fine for most people.
+I have changed the package to download phantomjs from `https://bitbucket.org/takuhii/phantomjs25-beta/downloads/` now, as I didn't want to be spanking Ariya's bandwidth. This should work fine for most people.
 
 ## Downloading from a custom URL
 

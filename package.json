@@ -1,6 +1,6 @@
 {
   "name": "phantomjs25-beta",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Headless Webkit with JS & ES6 API",
   "main": "install.js",
   "bin": {
@@ -45,7 +45,7 @@
   "author": "Darren Mackintosh <takuhii@gmail.com> (http://www.takuhii.tk)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/DarrenMack-OD/PhantomJS-Beta_25/issues"
+    "url": "https://github.com/DarrenMack-OD/PhantomJS-25_Beta/issues"
   },
   "homepage": "https://github.com/DarrenMack-OD/PhantomJS-Beta_25#readme"
 }
