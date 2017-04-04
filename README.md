@@ -64,46 +64,21 @@ I have changed the package to download phantomjs from `https://bitbucket.org/tak
 
 ## Downloading from a custom URL
 
-If bitbucket is down, or the Great Firewall is blocking bitbucket, you have a few options:
-
-#### Download from a phantomjs download mirror
-
-To set a mirror, set npm config property `phantomjs_cdnurl`.   The advantage of this
-approach is that it will carry over the proper detection of version and OS, however
-*the mirror must match the structure and naming conventions of
-`https://bitbucket.org/ariya/phantomjs/downloads`.
+If bitbucket is down, or the Great Firewall is blocking bitbucket, you have another option:
 
 ```shell
-npm install phantomjs --phantomjs_cdnurl=http://cnpmjs.org/downloads
-```
-
-Or add property into your `.npmrc` file (https://www.npmjs.org/doc/files/npmrc.html)
-
-```
-phantomjs_cdnurl=http://cnpmjs.org/downloads
-```
-
-Another option is to use environment variable `PHANTOMJS_CDNURL`.
-```shell
-PHANTOMJS_CDNURL=http://cnpmjs.org/downloads npm install phantomjs
-```
-
-#### Or, specify a specific download location.
-
-This is useful to entirely override the phantomjs download locaiton, i.e. if
-you wish to use a custom build.   As of this writing there are lots of
-custom builds for phantomjs2, particularly to get it working on various flavors
-of linux.  (see https://github.com/ariya/phantomjs/issues/12948)
-
-To set a specifc download location, set npm config property `phantomjs_downloadurl`.
-
-```shell
-npm install phantomjs --phantomjs_downloadurl=https://github.com/eugene1g/phantomjs/releases/download/2.0.0-bin/phantomjs-2.0.0-macosx.zip
+npm install phantomjs --phantomjs_downloadurl=https://bitbucket.org/takuhii/phantomjs25-beta/downloads/phantomjs-2.5.0-beta-windows.zip
+npm install phantomjs --phantomjs_downloadurl=https://bitbucket.org/takuhii/phantomjs25-beta/downloads/phantomjs-2.5.0-beta-macos.zip
+npm install phantomjs --phantomjs_downloadurl=https://bitbucket.org/takuhii/phantomjs25-beta/downloads/phantomjs-2.5.0-beta-linux-ubuntu-xenial-x86_64.tar.gz
+npm install phantomjs --phantomjs_downloadurl=https://bitbucket.org/takuhii/phantomjs25-beta/downloads/phantomjs-2.5.0-beta-linux-ubuntu-trusty-x86_64.tar.gz
 ```
 
 or set the environment variable `PHANTOMJS_DOWNLOADURL`.
 ```shell
-PHANTOMJS_DOWNLOADURL=https://github.com/eugene1g/phantomjs/releases/download/2.0.0-bin/phantomjs-2.0.0-macosx.zip npm install phantomjs
+PHANTOMJS_DOWNLOADURL=https://bitbucket.org/takuhii/phantomjs25-beta/downloads/phantomjs-2.5.0-beta-windows.zip npm install PhantomJS25-Beta
+PHANTOMJS_DOWNLOADURL=https://bitbucket.org/takuhii/phantomjs25-beta/downloads/phantomjs-2.5.0-beta-macos.zip npm install PhantomJS25-Beta
+PHANTOMJS_DOWNLOADURL=https://bitbucket.org/takuhii/phantomjs25-beta/downloads/phantomjs-2.5.0-beta-linux-ubuntu-xenial-x86_64.tar.gz npm install PhantomJS25-Beta
+PHANTOMJS_DOWNLOADURL=https://bitbucket.org/takuhii/phantomjs25-beta/downloads/phantomjs-2.5.0-beta-linux-ubuntu-trusty-x86_64.tar.gz npm install PhantomJS25-Beta
 ```
 
 
@@ -170,7 +145,7 @@ was not able to download the PhantomJS binary for your platform. Please try agai
 Do you live in China, or a country with an authoritarian government? We've seen problems where
 the GFW or local ISP blocks bitbucket, preventing the installer from downloading the binary.
 
-Try visiting the [the download page](http://cdn.bitbucket.org/ariya/phantomjs/downloads) manually.
+Try visiting the [the download page](https://bitbucket.org/takuhii/phantomjs25-beta/downloads/) manually.
 If that page is blocked, you can try using a different CDN with the `PHANTOMJS_CDNURL`
 env variable described above.
 
@@ -203,9 +178,9 @@ Contributing
 ------------
 
 Questions, comments, bug reports, and pull requests are all welcome.  Submit them at
-[the project on GitHub](https://travis-ci.org/DarrenMack-OD/PhantomJS-25_Beta/).
+[the project on GitHub](https://github.com/DarrenMack-OD/PhantomJS-25_Beta/issues).
 
-Uses [Ariya's bitbucket repo](https://bitbucket.org/ariya/phantomjs/downloads/) for downloading PhantomJS 2.5.
+PhantomJS 2.5 Beta archives sourced from [Ariya's bitbucket repo](https://bitbucket.org/ariya/phantomjs/downloads/).
 
 Install.js HEAVILY lifted from [Medium](https://github.com/Medium/phantomjs/)
 
