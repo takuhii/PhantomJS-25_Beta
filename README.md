@@ -5,7 +5,7 @@ An NPM wrapper for [PhantomJS](http://phantomjs.org/) *2.5 Beta* headless webkit
 
 NOTE: phantomjs v2.x is currently under heavy development. Releases should be considered unstable.
 
-[![NPM version](https://badge.fury.io/js/phantomjs25-beta.svg)](https://www.npmjs.com/package/phantomjs25-beta) [![Build Status](https://travis-ci.org/DarrenMack-OD/PhantomJS-25_Beta.svg?branch=master)](https://travis-ci.org/DarrenMack-OD/PhantomJS-25_Beta/)
+[![npm](https://img.shields.io/npm/v/npm.svg)]() [![npm](https://img.shields.io/npm/dm/localeval.svg)](https://www.npmjs.com/package/phantomjs25-beta) [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)](https://travis-ci.org/DarrenMack-OD/PhantomJS-25_Beta/)
 
 Building and Installing
 -----------------------
