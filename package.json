@@ -1,5 +1,5 @@
 {
-  "name": "PhantomJS 2.5-beta",
+  "name": "phantomjs25beta",
   "version": "1.0.10",
   "description": "Headless Webkit with JS & ES6 API",
   "main": "install.js",
