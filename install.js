@@ -236,7 +236,7 @@ function requestBinary(requestOptions, filePath) {
           'Response headers: ' + JSON.stringify(response.headers, null, 2) + '\n' +
           'Make sure your network and proxy settings are correct.\n\n' +
           'If you continue to have issues, please report this full log at ' +
-          'https://github.com/DarrenMack-OD/PhantomJS-25_Beta')
+          'https://github.com/takuhii/PhantomJS-25_Beta')
       exit(1)
     } else {
       handleRequestError(error)
