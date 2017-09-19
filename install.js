@@ -128,7 +128,7 @@ function findSuitableTempDirectory() {
   }
 
   console.error('Can not find a writable tmp directory, please report issue ' +
-      'on https://github.com/DarrenMack-OD/PhantomJS-25_Beta/issues with as much ' +
+      'on https://github.com/takuhii/PhantomJS-25_Beta/issues with as much ' +
       'information as possible.')
   exit(1)
 }
@@ -206,11 +206,11 @@ function handleRequestError(error) {
       exit(1)
   } else if (error) {
     console.error('Error making request.\n' + error.stack + '\n\n' +
-        'Please report this full log at https://github.com/DarrenMack-OD/PhantomJS-25_Beta')
+        'Please report this full log at https://github.com/takuhii/PhantomJS-25_Beta')
     exit(1)
   } else {
     console.error('Something unexpected happened, please report this full ' +
-        'log at https://github.com/DarrenMack-OD/PhantomJS-25_Beta')
+        'log at https://github.com/takuhii/PhantomJS-25_Beta')
     exit(1)
   }
 }
