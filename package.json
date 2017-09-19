@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DarrenMack-OD/PhantomJS-25_Beta.git"
+    "url": "git+https://github.com/takuhii/PhantomJS-25_Beta.git"
   },
   "keywords": [
     "PhantomJS",
@@ -42,7 +42,7 @@
     "nodeunit": "~0.9.1",
     "webdriverio": "~4.2.3"
   },
-  "author": "Darren Mackintosh <darren.mackintosh@officedepot.com>",
+  "author": "Darren Mackintosh <takuhii@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/DarrenMack-OD/PhantomJS-25_Beta/issues"
