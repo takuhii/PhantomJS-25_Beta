@@ -1,17 +1,30 @@
 {
-  "author": "Darren Mackintosh <takuhii@gmail.com> (https://www.darren-mackintosh.co.uk)",
   "name": "phantomjs25-beta",
+  "version": "1.0.15",
   "description": "Headless Webkit with JS & ES6 API",
-  "version": "1.0.16",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/takuhii/PhantomJS-25_Beta.git"
-  },
   "main": "install.js",
-  "bin": {
+   "bin": {
     "phantomjs": "./bin/phantomjs"
   },
-  "license": "MIT",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "install": "node install.js",
+    "test": "nodeunit --reporter=minimal test/tests.js && eslint install.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/takuhii/PhantomJS-25_Beta.git"
+  },
+  "keywords": [
+    "PhantomJS",
+    "Beta",
+    "2.5",
+    "Phantom",
+    "headless",
+    "webkit"
+  ],
   "dependencies": {
     "es6-promise": "~4.0.3",
     "extract-zip": "~1.5.0",
@@ -29,12 +42,10 @@
     "nodeunit": "~0.9.1",
     "webdriverio": "~4.2.3"
   },
-  "scripts": {
-    "install": "node install.js",
-    "test": "nodeunit --reporter=minimal test/tests.js && eslint install.js"
+  "author": "Darren Mackintosh <takuhii@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/takuhii/PhantomJS-25_Beta/issues"
   },
-  "files": [
-    "install.js",
-    "bin/phantomjs"
-  ]
+  "homepage": "https://github.com/takuhii/PhantomJS-25_Beta#readme"
 }
