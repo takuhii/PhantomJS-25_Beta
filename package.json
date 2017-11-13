@@ -9,7 +9,9 @@
     "url": "git://github.com/takuhii/PhantomJS-25_Beta.git"
   },
   "main": "install.js",
-  "bin": "./bin/phantomjs"
+  "bin": {
+    "phantomjs": "./bin/phantomjs"
+  },
   "license": "MIT",
   "dependencies": {
     "es6-promise": "~4.0.3",
