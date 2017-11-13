@@ -11,7 +11,7 @@ Building and Installing
 -----------------------
 
 ```shell
-npm install PhantomJS25-Beta
+npm install phantomjs25-beta
 ```
 
 The package has been set up to fetch and run Phantom for MacOS (darwin), Ubuntu Linux (Xenial) & Windows.
