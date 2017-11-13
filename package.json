@@ -41,6 +41,10 @@
     "nodeunit": "~0.9.1",
     "webdriverio": "~4.2.3"
   },
+  "files": [
+    "install.js",
+    "bin/phantomjs"
+  ],
   "author": "Darren Mackintosh <takuhii@gmail.com>",
   "license": "MIT",
   "bugs": {
