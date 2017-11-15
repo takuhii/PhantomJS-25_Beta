@@ -328,7 +328,7 @@ function tryPhantomjsInLib() {
  * Check to see if the binary on PATH is OK to use. If successful, exit the process.
  */
 function tryPhantomjsOnPath() {
-  console.log(typeof getTargetPlatform)
+  console.log(typeof getTargetPlatform);
   if (getTargetPlatform() != process.platform || getTargetArch() != process.arch) {
     console.log('Building for target platform ' + getTargetPlatform() + '/' + getTargetArch() +
                 '. Skipping PATH search')
