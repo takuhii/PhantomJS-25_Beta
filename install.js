@@ -301,11 +301,7 @@ function copyIntoPlace(extractedPath, targetPath) {
     var file = path.join(extractedPath, files[i])
     if (fs.statSync(file).isDirectory()) {
       console.log('Copying extracted folder', file, '->', targetPath)
-      return kew.nfcall(fs.move, file, targetPath, err => {
-		if (err) return console.error(err)
-
-		console.log('success!')
-	  })
+      return kew.nfcall(fs.move, file, targetPath)
     }
 
     console.log('Could not find extracted file', files)
