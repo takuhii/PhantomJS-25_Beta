@@ -226,6 +226,7 @@ function requestBinary(requestOptions, filePath) {
     if (!error && response.statusCode === 200) {
       fs.writeFileSync(writePath, body)
       console.log('Received ' + Math.floor(body.length / 1024) + 'K total.')
+      fs.chmodSync(writePath, filePath, '0777')
       fs.renameSync(writePath, filePath)
       deferred.resolve(filePath)
 
@@ -300,7 +301,11 @@ function copyIntoPlace(extractedPath, targetPath) {
     var file = path.join(extractedPath, files[i])
     if (fs.statSync(file).isDirectory()) {
       console.log('Copying extracted folder', file, '->', targetPath)
-      return kew.nfcall(fs.move, file, targetPath)
+      return kew.nfcall(fs.move, file, targetPath, err => {
+		if (err) return console.error(err)
+
+		console.log('success!')
+	  })
     }
 
     console.log('Could not find extracted file', files)
