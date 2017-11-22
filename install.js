@@ -226,7 +226,6 @@ function requestBinary(requestOptions, filePath) {
     if (!error && response.statusCode === 200) {
       fs.writeFileSync(writePath, body)
       console.log('Received ' + Math.floor(body.length / 1024) + 'K total.')
-      fs.chmodSync(writePath, filePath, '0777')
       fs.renameSync(writePath, filePath)
       deferred.resolve(filePath)
 
