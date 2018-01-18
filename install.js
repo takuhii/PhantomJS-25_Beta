@@ -311,7 +311,7 @@ function copyIntoPlace(extractedPath, targetPath) {
  * Check to see if the binary in lib is OK to use. If successful, exit the process.
  */
 function tryPhantomjsInLib() {
-  return kew.fcall(function () {
+  return kew.nfcall(function () {
     return findValidPhantomJsBinary(path.resolve(__dirname, './lib/location.js'))
   }).then(function (binaryLocation) {
     if (binaryLocation) {
