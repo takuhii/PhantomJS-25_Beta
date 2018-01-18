@@ -304,7 +304,7 @@ function copyIntoPlace(extractedPath, targetPath) {
       var file = path.join(extractedPath, files[i])
       if (fs.statSync(file).isDirectory()) {
         console.log('Copying extracted folder', file, '->', targetPath)
-        ncp(extractedPath, targetPath, function (err) {
+        ncp(file, targetPath, function (err) {
           if (err) {
             return console.error(err);
           }
