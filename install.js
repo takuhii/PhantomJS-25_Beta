@@ -1,9 +1,4 @@
 // Copyright 2018 Darren Mackintosh.
-
-/*
- * This simply fetches the right version of phantom for the current platform.
- */
-
 'use strict'
 
 var requestProgress = require('request-progress')
@@ -303,7 +298,7 @@ function copyIntoPlace(extractedPath, targetPath) {
       var file = path.join(extractedPath, files[i])
       if (fs.statSync(file).isDirectory()) {
         console.log('Copying extracted folder', file, '->', targetPath)
-        fs.copy(file, targetPath)
+        fs.copy(file, targetPath, { overwrite: true })
       }
     }
 
