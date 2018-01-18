@@ -302,6 +302,7 @@ function copyIntoPlace(extractedPath, targetPath) {
     for (var i = 0; i < files.length; i++) {
       var file = path.join(extractedPath, files[i])
       if (fs.statSync(file).isDirectory()) {
+        fs.chmodSync(file, '0777')
         console.log('Copying extracted folder', file, '->', targetPath)
         return kew.nfcall(fs.move, file, targetPath)
       }
