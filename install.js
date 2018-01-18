@@ -404,7 +404,7 @@ function downloadPhantomjs() {
   var downloadUrl = downloadSpec.url
   var downloadedFile
 
-  return kew.fcall(function () {
+  return kew.nfcall(function () {
     // Can't use a global version so start a download.
     var tmpPath = findSuitableTempDirectory()
     var fileName = downloadUrl.split('/').pop()
