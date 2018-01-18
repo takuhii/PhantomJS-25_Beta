@@ -1,9 +1,9 @@
 {
   "name": "phantomjs25-beta",
-  "version": "1.0.15",
+  "version": "1.0.18",
   "description": "Headless Webkit with JS & ES6 API",
   "main": "install.js",
-   "bin": {
+  "bin": {
     "phantomjs": "./bin/phantomjs"
   },
   "directories": {
@@ -26,6 +26,7 @@
     "webkit"
   ],
   "dependencies": {
+    "cp-file": "^5.0.0",
     "es6-promise": "~4.0.3",
     "extract-zip": "~1.5.0",
     "fs-extra": "~1.0.0",
