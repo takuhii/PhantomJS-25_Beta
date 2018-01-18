@@ -1,9 +1,11 @@
-PhantomJS 2.5 Beta
+DEPRACATED: PhantomJS 2.5 Beta
 =========
 
 An NPM wrapper for [PhantomJS](http://phantomjs.org/) *2.5 Beta* headless webkit with JS API.
 
-NOTE: phantomjs v2.x is currently under heavy development. Releases should be considered unstable.
+NOTE: phantomjs v2.x is no longer under development. Releases should be considered final and unstable.
+
+Would advise using Headless Chrime instead.
 
 [![npm](https://img.shields.io/npm/v/npm.svg)]() [![npm](https://img.shields.io/npm/dm/phantomjs25-beta.svg)](https://www.npmjs.com/package/phantomjs25-beta) [![Travis](https://img.shields.io/travis/takuhii/PhantomJS-25_Beta.svg)](https://travis-ci.org/takuhii/PhantomJS-25_Beta/)
 
