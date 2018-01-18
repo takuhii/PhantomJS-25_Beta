@@ -304,14 +304,7 @@ function copyIntoPlace(extractedPath, targetPath) {
       var file = path.join(extractedPath, files[i])
       if (fs.statSync(file).isDirectory()) {
         console.log('Copying extracted folder', file, '->', targetPath)
-        copydir(file, targetPath, function(err){
-          if(err){
-            console.log(err);
-          } else {
-            console.log('PhantomJS copied OK');
-          }
-        });
-/**        return Q.nfcall(fs.move, file, targetPath) */
+        fs.copy(file, targetPath)
       }
     }
 
