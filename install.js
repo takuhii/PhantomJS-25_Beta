@@ -68,7 +68,7 @@ Q.resolve(true)
 
     try {
       // Ensure executable is executable by all users
-      fs.chmodSync(location, '755')
+      fs.chmodSync(location, 0775)
     } catch (err) {
       if (err.code == 'ENOENT') {
         console.error('chmod failed: phantomjs was not successfully copied to', location)
@@ -109,10 +109,10 @@ function findSuitableTempDirectory() {
 
     try {
       candidatePath = path.join(path.resolve(candidatePath), 'phantomjs')
-      fs.mkdirsSync(candidatePath, '0777')
+      fs.mkdirsSync(candidatePath, 0775)
       // Make double sure we have 0777 permissions; some operating systems
       // default umask does not allow write by default.
-      fs.chmodSync(candidatePath, '0777')
+      fs.chmodSync(candidatePath, 0775)
       var testFile = path.join(candidatePath, now + '.tmp')
       fs.writeFileSync(testFile, 'test')
       fs.unlinkSync(testFile)
@@ -260,10 +260,10 @@ function extractDownload(filePath) {
   var extractedPath = filePath + '-extract-' + Date.now()
   var options = {cwd: extractedPath}
 
-  fs.mkdirsSync(extractedPath, '0777')
+  fs.mkdirsSync(extractedPath, 0775)
   // Make double sure we have 0777 permissions; some operating systems
   // default umask does not allow write by default.
-  fs.chmodSync(extractedPath, '0777')
+  fs.chmodSync(extractedPath, 0775)
 
   if (filePath.substr(-4) === '.zip') {
     console.log('Extracting zip contents')
