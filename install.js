@@ -10,7 +10,7 @@ var requestProgress = require('request-progress')
 var progress = require('progress')
 var extractZip = require('extract-zip')
 var cp = require('child_process')
-var cpFile = require('cp-file')
+var ncp = require('ncp').ncp
 var fs = require('fs-extra')
 var helper = require('./lib/phantomjs')
 var Q = require('kew')
@@ -304,8 +304,11 @@ function copyIntoPlace(extractedPath, targetPath) {
       var file = path.join(extractedPath, files[i])
       if (fs.statSync(file).isDirectory()) {
         console.log('Copying extracted folder', file, '->', targetPath)
-        cpFile(extractedPath, targetPath).then(() => {
-          console.log('File copied');
+        ncp(extractedPath, targetPath, function (err) {
+          if (err) {
+            return console.error(err);
+          }
+          console.log('Phantom copied successfully');
         });
 /**        return Q.nfcall(fs.move, file, targetPath) */
       }
