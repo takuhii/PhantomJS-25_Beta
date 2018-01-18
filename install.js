@@ -1,4 +1,4 @@
-// Copyright 2017 Darren Mackintosh.
+// Copyright 2018 Darren Mackintosh.
 
 /*
  * This simply fetches the right version of phantom for the current platform.
