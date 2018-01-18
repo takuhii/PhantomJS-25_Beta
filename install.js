@@ -223,6 +223,7 @@ function requestBinary(requestOptions, filePath) {
   console.log('Receiving...')
   var bar = null
   requestProgress(request(requestOptions, function (error, response, body) {
+    console.log('')
     if (!error && response.statusCode === 200) {
       fs.writeFileSync(writePath, body)
       console.log('Received ' + Math.floor(body.length / 1024) + 'K total.')
@@ -294,18 +295,21 @@ function extractDownload(filePath) {
 }
 
 function copyIntoPlace(extractedPath, targetPath) {
-  // Look for the extracted directory, so we can rename it.
-  var files = fs.readdirSync(extractedPath)
-  for (var i = 0; i < files.length; i++) {
-    var file = path.join(extractedPath, files[i])
-    if (fs.statSync(file).isDirectory()) {
-      console.log('Copying extracted folder', file, '->', targetPath)
-      return kew.nfcall(fs.move, file, targetPath)
+  console.log('Removing', targetPath)
+  return kew.nfcall(fs.remove, targetPath).then(function () {
+    // Look for the extracted directory, so we can rename it.
+    var files = fs.readdirSync(extractedPath)
+    for (var i = 0; i < files.length; i++) {
+      var file = path.join(extractedPath, files[i])
+      if (fs.statSync(file).isDirectory()) {
+        console.log('Copying extracted folder', file, '->', targetPath)
+        return kew.nfcall(fs.move, file, targetPath)
+      }
     }
 
     console.log('Could not find extracted file', files)
     throw new Error('Could not find extracted file')
-  }
+  })
 }
 
 /**
@@ -328,8 +332,6 @@ function tryPhantomjsInLib() {
  * Check to see if the binary on PATH is OK to use. If successful, exit the process.
  */
 function tryPhantomjsOnPath() {
-  console.log(typeof getTargetPlatform)
-  
   if (getTargetPlatform() != process.platform || getTargetArch() != process.arch) {
     console.log('Building for target platform ' + getTargetPlatform() + '/' + getTargetArch() +
                 '. Skipping PATH search')
