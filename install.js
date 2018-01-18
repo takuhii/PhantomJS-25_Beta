@@ -1,6 +1,4 @@
 // Copyright 2018 Darren Mackintosh.
-'use strict'
-
 var requestProgress = require('request-progress')
 var progress = require('progress')
 var extractZip = require('extract-zip')
