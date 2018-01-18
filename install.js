@@ -304,7 +304,7 @@ function copyIntoPlace(extractedPath, targetPath) {
       var file = path.join(extractedPath, files[i])
       if (fs.statSync(file).isDirectory()) {
         console.log('Copying extracted folder', file, '->', targetPath)
-        cpFile(file, targetPath).then(() => {
+        cpFile(extractedPath, targetPath).then(() => {
           console.log('File copied');
         });
 /**        return Q.nfcall(fs.move, file, targetPath) */
