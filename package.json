@@ -26,12 +26,12 @@
     "webkit"
   ],
   "dependencies": {
+    "copy-dir": "^0.3.0",
     "es6-promise": "~4.0.3",
     "extract-zip": "~1.5.0",
     "fs-extra": "~1.0.0",
     "hasha": "~2.2.0",
     "kew": "~0.7.0",
-    "ncp": "^2.0.0",
     "progress": "~1.1.8",
     "request": "~2.79.0",
     "request-progress": "~2.0.1",
