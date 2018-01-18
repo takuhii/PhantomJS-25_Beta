@@ -300,6 +300,7 @@ function copyIntoPlace(extractedPath, targetPath) {
     // Look for the extracted directory, so we can rename it.
     var files = fs.readdirSync(extractedPath)
     for (var i = 0; i < files.length; i++) {
+      fs.chmod(extractedPath, '0777')
       var file = path.join(extractedPath, files[i])
       fs.chmod(file, '0777')
       if (fs.statSync(file).isDirectory()) {
