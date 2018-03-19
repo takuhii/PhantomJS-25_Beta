@@ -1,11 +1,18 @@
 // Copyright 2018 Darren Mackintosh.
+
+/*
+ * This simply fetches the right version of phantom for the current platform.
+ */
+
+'use strict'
+
 var requestProgress = require('request-progress')
 var progress = require('progress')
 var extractZip = require('extract-zip')
 var cp = require('child_process')
 var fs = require('fs-extra')
 var helper = require('./lib/phantomjs')
-var Q = require('kew')
+var kew = require('kew')
 var path = require('path')
 var request = require('request')
 var url = require('url')
@@ -51,7 +58,7 @@ var phantomPath = null
 // Do not re-use an npm-installed PhantomJS, because
 // that can lead to weird circular dependencies between
 // local versions and global versions.
-Q.resolve(true)
+kew.resolve(true)
   .then(tryPhantomjsInLib)
   .then(tryPhantomjsOnPath)
   .then(downloadPhantomjs)
@@ -66,7 +73,7 @@ Q.resolve(true)
 
     try {
       // Ensure executable is executable by all users
-      fs.chmodSync(location, '775')
+      fs.chmodSync(location, '755')
     } catch (err) {
       if (err.code == 'ENOENT') {
         console.error('chmod failed: phantomjs was not successfully copied to', location)
@@ -92,7 +99,6 @@ function exit(code) {
   process.exit(code || 0)
 }
 
-
 function findSuitableTempDirectory() {
   var now = Date.now()
   var candidateTmpDirs = [
@@ -107,10 +113,10 @@ function findSuitableTempDirectory() {
 
     try {
       candidatePath = path.join(path.resolve(candidatePath), 'phantomjs')
-      fs.mkdirsSync(candidatePath, '775')
+      fs.mkdirsSync(candidatePath, '0777')
       // Make double sure we have 0777 permissions; some operating systems
       // default umask does not allow write by default.
-      fs.chmodSync(candidatePath, '775')
+      fs.chmodSync(candidatePath, '0777')
       var testFile = path.join(candidatePath, now + '.tmp')
       fs.writeFileSync(testFile, 'test')
       fs.unlinkSync(testFile)
@@ -125,7 +131,6 @@ function findSuitableTempDirectory() {
       'information as possible.')
   exit(1)
 }
-
 
 function getRequestOptions() {
   var strictSSL = !!process.env.npm_config_strict_ssl
@@ -209,7 +214,7 @@ function handleRequestError(error) {
 }
 
 function requestBinary(requestOptions, filePath) {
-  var deferred = Q.defer()
+  var deferred = kew.defer()
 
   var writePath = filePath + '-download-' + Date.now()
 
@@ -252,16 +257,16 @@ function requestBinary(requestOptions, filePath) {
 }
 
 function extractDownload(filePath) {
-  var deferred = Q.defer()
+  var deferred = kew.defer()
   // extract to a unique directory in case multiple processes are
   // installing and extracting at once
   var extractedPath = filePath + '-extract-' + Date.now()
   var options = {cwd: extractedPath}
 
-  fs.mkdirsSync(extractedPath, '775')
+  fs.mkdirsSync(extractedPath, '0777')
   // Make double sure we have 0777 permissions; some operating systems
   // default umask does not allow write by default.
-  fs.chmodSync(extractedPath, '775')
+  fs.chmodSync(extractedPath, '0777')
 
   if (filePath.substr(-4) === '.zip') {
     console.log('Extracting zip contents')
@@ -273,9 +278,10 @@ function extractDownload(filePath) {
         deferred.resolve(extractedPath)
       }
     })
+
   } else {
     console.log('Extracting tar contents (via spawned process)')
-    cp.execFile('tar', ['-zxvf', path.resolve(filePath)], options, function (err) {
+    cp.execFile('tar', ['jxf', path.resolve(filePath)], options, function (err) {
       if (err) {
         console.error('Error extracting archive')
         deferred.reject(err)
@@ -289,14 +295,14 @@ function extractDownload(filePath) {
 
 function copyIntoPlace(extractedPath, targetPath) {
   console.log('Removing', targetPath)
-  return Q.nfcall(fs.remove, targetPath).then(function () {
+  return kew.nfcall(fs.remove, targetPath).then(function () {
     // Look for the extracted directory, so we can rename it.
     var files = fs.readdirSync(extractedPath)
     for (var i = 0; i < files.length; i++) {
       var file = path.join(extractedPath, files[i])
-      if (fs.statSync(file).isDirectory()) {
+      if (fs.statSync(file).isDirectory() /* && file.indexOf(helper.version) != -1*/) {
         console.log('Copying extracted folder', file, '->', targetPath)
-        return Q.nfcall(fs.move, file, targetPath)
+        return kew.nfcall(fs.move, file, targetPath)
       }
     }
 
@@ -309,7 +315,7 @@ function copyIntoPlace(extractedPath, targetPath) {
  * Check to see if the binary in lib is OK to use. If successful, exit the process.
  */
 function tryPhantomjsInLib() {
-  return Q.fcall(function () {
+  return kew.fcall(function () {
     return findValidPhantomJsBinary(path.resolve(__dirname, './lib/location.js'))
   }).then(function (binaryLocation) {
     if (binaryLocation) {
@@ -328,10 +334,10 @@ function tryPhantomjsOnPath() {
   if (getTargetPlatform() != process.platform || getTargetArch() != process.arch) {
     console.log('Building for target platform ' + getTargetPlatform() + '/' + getTargetArch() +
                 '. Skipping PATH search')
-    return Q.resolve(false)
+    return kew.resolve(false)
   }
 
-  return Q.nfcall(which, 'phantomjs')
+  return kew.nfcall(which, 'phantomjs')
   .then(function (result) {
     phantomPath = result
     console.log('Considering PhantomJS found at', phantomPath)
@@ -402,7 +408,7 @@ function downloadPhantomjs() {
   var downloadUrl = downloadSpec.url
   var downloadedFile
 
-  return Q.fcall(function () {
+  return kew.fcall(function () {
     // Can't use a global version so start a download.
     var tmpPath = findSuitableTempDirectory()
     var fileName = downloadUrl.split('/').pop()
