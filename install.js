@@ -1,8 +1,8 @@
 /*
  * This simply fetches the right version of phantom for the current platform.
- *
- * 'use strict'
  */
+'use strict'
+
 
 var requestProgress = require('request-progress')
 var progress = require('progress')
