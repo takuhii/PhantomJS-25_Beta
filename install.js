@@ -4,11 +4,11 @@
 'use strict'
 
 
-var requestProgress = require('request-progress')
-var progress = require('progress')
+var fs = require('fs-extra')
+var request = require('request')
+var progress = require('request-progress')
 var extractZip = require('extract-zip')
 var cp = require('child_process')
-var fs = require('fs-extra')
 var helper = require('./lib/phantomjs')
 var Q = require('kew')
 var path = require('path')
@@ -101,7 +101,7 @@ function findSuitableTempDirectory() {
   var now = Date.now()
   var candidateTmpDirs = [
     process.env.npm_config_tmp,
-    os.homedir(),
+    os.tmpdir(),
     path.join(process.cwd(), 'tmp')
   ]
 
@@ -218,7 +218,7 @@ function requestBinary(requestOptions, filePath) {
 
   console.log('Receiving...')
   var bar = null
-  requestProgress(request(requestOptions, function (error, response, body) {
+  progress(request(requestOptions, function (error, response, body) {
     console.log('')
     if (!error && response.statusCode === 200) {
       fs.writeFileSync(writePath, body)
