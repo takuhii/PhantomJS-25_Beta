@@ -10,13 +10,14 @@ var extractZip = require('extract-zip')
 var cp = require('child_process')
 var fs = require('fs-extra')
 var helper = require('./lib/phantomjs')
-var kew = require('kew')
+var Q = require('kew')
 var path = require('path')
 var request = require('request')
 var url = require('url')
 var util = require('./lib/util')
 var which = require('which')
-var os = require('os')
+//var os = require('os')
+var osTmpdir = require('os-tmpdir');
 
 var originalPath = process.env.PATH
 
@@ -56,7 +57,7 @@ var phantomPath = null
 // Do not re-use an npm-installed PhantomJS, because
 // that can lead to weird circular dependencies between
 // local versions and global versions.
-kew.resolve(true)
+Q.resolve(true)
   .then(tryPhantomjsInLib)
   .then(tryPhantomjsOnPath)
   .then(downloadPhantomjs)
@@ -101,7 +102,7 @@ function findSuitableTempDirectory() {
   var now = Date.now()
   var candidateTmpDirs = [
     process.env.npm_config_tmp,
-    os.tmpdir(),
+    osTmpdir(),
     path.join(process.cwd(), 'tmp')
   ]
 
@@ -212,7 +213,7 @@ function handleRequestError(error) {
 }
 
 function requestBinary(requestOptions, filePath) {
-  var deferred = kew.defer()
+  var deferred = Q.defer()
 
   var writePath = filePath + '-download-' + Date.now()
 
@@ -255,7 +256,7 @@ function requestBinary(requestOptions, filePath) {
 }
 
 function extractDownload(filePath) {
-  var deferred = kew.defer()
+  var deferred = Q.defer()
   // extract to a unique directory in case multiple processes are
   // installing and extracting at once
   var extractedPath = filePath + '-extract-' + Date.now()
@@ -293,14 +294,14 @@ function extractDownload(filePath) {
 
 function copyIntoPlace(extractedPath, targetPath) {
   console.log('Removing', targetPath)
-  return kew.nfcall(fs.remove, targetPath).then(function () {
+  return Q.nfcall(fs.remove, targetPath).then(function () {
     // Look for the extracted directory, so we can rename it.
     var files = fs.readdirSync(extractedPath)
     for (var i = 0; i < files.length; i++) {
       var file = path.join(extractedPath, files[i])
       if (fs.statSync(file).isDirectory() /* && file.indexOf(helper.version) != -1*/) {
         console.log('Copying extracted folder', file, '->', targetPath)
-        return kew.nfcall(fs.move, file, targetPath)
+        return Q.nfcall(fs.move, file, targetPath)
       }
     }
 
@@ -313,7 +314,7 @@ function copyIntoPlace(extractedPath, targetPath) {
  * Check to see if the binary in lib is OK to use. If successful, exit the process.
  */
 function tryPhantomjsInLib() {
-  return kew.fcall(function () {
+  return Q.fcall(function () {
     return findValidPhantomJsBinary(path.resolve(__dirname, './lib/location.js'))
   }).then(function (binaryLocation) {
     if (binaryLocation) {
@@ -332,10 +333,10 @@ function tryPhantomjsOnPath() {
   if (getTargetPlatform() != process.platform || getTargetArch() != process.arch) {
     console.log('Building for target platform ' + getTargetPlatform() + '/' + getTargetArch() +
                 '. Skipping PATH search')
-    return kew.resolve(false)
+    return Q.resolve(false)
   }
 
-  return kew.nfcall(which, 'phantomjs')
+  return Q.nfcall(which, 'phantomjs')
   .then(function (result) {
     phantomPath = result
     console.log('Considering PhantomJS found at', phantomPath)
@@ -406,7 +407,7 @@ function downloadPhantomjs() {
   var downloadUrl = downloadSpec.url
   var downloadedFile
 
-  return kew.fcall(function () {
+  return Q.fcall(function () {
     // Can't use a global version so start a download.
     var tmpPath = findSuitableTempDirectory()
     var fileName = downloadUrl.split('/').pop()
