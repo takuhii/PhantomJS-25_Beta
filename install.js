@@ -16,7 +16,7 @@ var request = require('request')
 var url = require('url')
 var util = require('./lib/util')
 var which = require('which')
-var os = require('os');
+var os = require('os')
 
 var originalPath = process.env.PATH
 
