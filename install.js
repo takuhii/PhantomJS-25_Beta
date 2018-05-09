@@ -16,8 +16,7 @@ var request = require('request')
 var url = require('url')
 var util = require('./lib/util')
 var which = require('which')
-//var os = require('os')
-var osTmpdir = require('os-tmpdir');
+var os = require('os');
 
 var originalPath = process.env.PATH
 
@@ -102,7 +101,7 @@ function findSuitableTempDirectory() {
   var now = Date.now()
   var candidateTmpDirs = [
     process.env.npm_config_tmp,
-    osTmpdir(),
+    os.homedir(),
     path.join(process.cwd(), 'tmp')
   ]
 
