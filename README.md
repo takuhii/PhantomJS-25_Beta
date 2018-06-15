@@ -1,11 +1,11 @@
 PhantomJS 2.5 Beta
 =========
 
+# THIS PROJECT IS DEPRECATED
+This component is not maintained anymore. I have an installation issue I can't seem to resolve... I've reached out to multiple communities and devs and still had no joy. Besides, the phantomjs v2.5 binary is no longer under development. Releases should be considered final and unstable. I would advise using Headless Chrome instead. If I do figure out a way to fix the installation problem. I'll de-deprecate the code. I am however leaving the code up for historical purposes.
+
+# WHAT IS THIS?
 An NPM wrapper for [PhantomJS](http://phantomjs.org/) *2.5 Beta* headless webkit with JS API.
-
-NOTE: phantomjs v2.x is no longer under development. Releases should be considered final and unstable.
-
-Would advise using Headless Chrome instead.
 
 [![npm](https://img.shields.io/npm/v/npm.svg)]() [![npm](https://img.shields.io/npm/dm/phantomjs25-beta.svg)](https://www.npmjs.com/package/phantomjs25-beta) [![Travis](https://img.shields.io/travis/takuhii/PhantomJS-25_Beta.svg)](https://travis-ci.org/takuhii/PhantomJS-25_Beta/)
 
